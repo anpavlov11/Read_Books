@@ -3,8 +3,20 @@ const router = express.Router() //router of express variable
 const Author = require('../models/author') //gives access to author model
 
 //Authors Route
-router.get('/', (req, res) => { //get action to get route of app (localhost:__); this is request and response
-    res.render('authors/index') //response--render all authors view
+router.get('/', async (req, res) => { //get action to get route of app (localhost:__); this is request and response
+    let searchOptions = {}
+    if (req.query.name != null && req.query.name !== ' ') {   //.query used for url instead of .body like POST; GET req. info through url query string
+        searchOptions.name = new RegExp(req.query.name, 'i') //RegExp allows searching for part of the text; 'i' case insensitive
+    }
+    try {
+        const authors = await Author.find(searchOptions)
+        res.render('authors/index', { //response--render all authors view
+            authors: authors, 
+            searchOptions: req.query 
+        }) 
+    } catch {
+        res.redirect('/') //rerenders the page
+    }
 })
 
 //New Author
@@ -20,7 +32,7 @@ router.post('/', async (req, res) => { //using async,await will save time in mor
     try {
         const newAuthor = await author.save() //await the asynchronous call to be completed (line 16)
         // res.redirect(`authors/${newAuthor.id}`)
-            res.redirect(`authors`)
+            res.redirect(`authors`) //rerenders the page
 
     } catch {
         res.render('authors/new', {
