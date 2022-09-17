@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== 'production') { //check to ensure app is running in
 const express = require('express') //import express
 const app = express()
 const expressLayouts = require('express-ejs-layouts') //import express layouts package
+const bodyParser = require('body-parser') //easier to access the different access elements
 
 const indexRouter = require('./routes/index') //import router into server using relative path
 const authorRouter = require('./routes/authors') //import ALL AUTHORS router into server using relative path
@@ -14,6 +15,7 @@ app.set('views', __dirname + '/views') //where server rendered views with come f
 app.set('layout', 'layouts/layout') //every file put inside to prevent necessity of duplicating HTML and CSS files
 app.use(expressLayouts) //tells app to use express layouts
 app.use(express.static('public')) //tells app where all public files will come from
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: false })) //tells express how to use body-parser library; from body-parser documentation
 
 const mongoose = require('mongoose') // import Moongoose
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }) //string for URL from environment variables with options for MongoDB set up inside app
