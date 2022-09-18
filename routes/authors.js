@@ -9,7 +9,7 @@ router.get('/', async (req, res) => { //get action to get route of app (localhos
         searchOptions.name = new RegExp(req.query.name, 'i') //RegExp allows searching for part of the text; 'i' case insensitive
     }
     try {
-        const authors = await Author.find(searchOptions)
+        const authors = await Author.find(searchOptions) //search authors
         res.render('authors/index', { //response--render all authors view
             authors: authors, 
             searchOptions: req.query 
