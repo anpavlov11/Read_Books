@@ -22,7 +22,7 @@ const mongoose = require('mongoose') // import Moongoose
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }) //string for URL from environment variables with options for MongoDB set up inside app
 const db = mongoose.connection //check for connection to database
 db.on('error', error => console.error(error)) //prints error to console if connection fails
-db.once('open', () => console.log('We have a connection!')) //prints when app is connected to database
+db.once('open', () => console.log('We have a connection...to the database!')) //prints when app is connected to database
 
 app.use('/', indexRouter) //tell app to use route path and router to handle this route
 app.use('/authors', authorRouter) //tell app to use ALL AUTHORS route path and router to handle this route
