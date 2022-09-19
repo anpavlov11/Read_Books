@@ -26,12 +26,10 @@ router.get('/', async (req, res) => {
     res.redirect('/')
   }
 })
-
 // New Book Route
 router.get('/new', async (req, res) => {
   renderNewPage(res, new Book())
 })
-
 // Create Book Route
 router.post('/', async (req, res) => {
   const book = new Book({
@@ -49,6 +47,15 @@ router.post('/', async (req, res) => {
     res.redirect(`books`)
   } catch {
     renderNewPage(res, book, true)
+  }
+})
+
+router.get('/:id', async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).populate('author').exec()
+    res.render('books/show', { book: book })
+  } catch {
+    res.redirrect('/')
   }
 })
 
