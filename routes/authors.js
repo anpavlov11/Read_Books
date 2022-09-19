@@ -1,8 +1,9 @@
 const express = require('express') //import express variable
 const router = express.Router() //router of express variable
-const Author = require('../models/author') //gives access to author model
+const Author = require('../models/author') //access to author model
+const Book = require('../models/book') //access to book model
 
-//Authors Route
+//Authors Index Route
 router.get('/', async (req, res) => { //get action to get route of app (localhost:__); this is request and response
     let searchOptions = {}
     if (req.query.name != null && req.query.name !== ' ') {   //.query used for url instead of .body like POST; GET req. info through url query string
@@ -18,21 +19,18 @@ router.get('/', async (req, res) => { //get action to get route of app (localhos
         res.redirect('/') //rerenders the page
     }
 })
-
 //New Author
 router.get('/new', (req, res) => {
     res.render('authors/new', {author: new Author() }) //Author object; doesn't save anything to database but can be updated
 })
-
 //Create Author
 router.post('/', async (req, res) => { //using async,await will save time in more complex routes--update, ...
     const author = new Author ({
         name: req.body.name //explicitly tells the server which parameters to accept from the client
     })
     try {
-        const newAuthor = await author.save() //await the asynchronous call to be completed (line 16)
-        // res.redirect(`authors/${newAuthor.id}`)
-            res.redirect(`authors`) //rerenders the page
+        const newAuthor = await author.save() //await the asynchronous call to be completed
+        res.redirect(`authors/${newAuthor.id}`) //rerenders the page
     } catch {
         res.render('authors/new', {
             author: author, //if an author name is entered again it will be repopulated back in to the value 
@@ -40,21 +38,61 @@ router.post('/', async (req, res) => { //using async,await will save time in mor
         })
     }
 })
-
-router.get('/:id', (req, res) => { //id variable called to be passed along with req
-    res.send('Show Author ' + req.params.id) //paramas on req obj gives all params defined on url
+//Show Route
+router.get('/:id', async (req, res) => { //id variable called to be passed along with req
+    try {
+        const author = await Author.findById(req.params.id)
+        const books = await Book.find({ author: author.id }).limit(9).exec()
+        res.render('authors/show', {
+            author: author,
+            booksByAuthor: books
+        })
+    } catch {
+        res.redirect('/')
+    }
 })
-
-router.get('/:id/edit', (req, res) => { //following REST principles on how to define urls
-    res.send('Edit Author ' + req.params.id)
+//Edit Route
+router.get('/:id/edit', async (req, res) => { //following REST principles on how to define urls
+    try {
+        const author = await Author.findById(req.params.id)
+        res.render('authors/edit', { author: author })
+    } catch {
+        res.redirect('/authors')
+    }
 })
-
-router.put('/:id', (req, res) => { //REST uses put to update
-    res.send('Update Author ' + req.params.id)
+//Update Route
+router.put('/:id', async (req, res) => { //REST uses PUT to update
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        author.name = req.body.name //changes name
+        await author.save() //await the asynchronous call to be completed then save
+        res.redirect(`/authors/${Author.id}`) //rerenders the page
+    } catch {
+        if (author == null) {
+            res.redirect('/')
+        } else {
+        res.render('authors/edit', {
+            author: author, //if an author name is entered again it will be repopulated back in to the value 
+            errorMessage: 'Error updating author'
+            })
+        }
+    }
 })
-
-router.delete('/:id', (req, res) => {
-    res.send(('Delete Author ' + req.params.id))
+//Delete Route
+router.delete('/:id', async (req, res) => {
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        await author.remove() //await the asynchronous call to be completed then delete
+        res.redirect('/authors/') //rerenders the page
+    } catch {
+        if (author == null) {
+            res.redirect('/')
+        } else {
+        res.redirect(`/authors/${author.id}`)
+        }
+    }
 })
 
 module.exports = router //exports router to be imported and user wherever the import is called; now can integrate routes with views
