@@ -33,13 +33,28 @@ router.post('/', async (req, res) => { //using async,await will save time in mor
         const newAuthor = await author.save() //await the asynchronous call to be completed (line 16)
         // res.redirect(`authors/${newAuthor.id}`)
             res.redirect(`authors`) //rerenders the page
-
     } catch {
         res.render('authors/new', {
             author: author, //if an author name is entered again it will be repopulated back in to the value 
             errorMessage: 'Error creating author'
         })
     }
+})
+
+router.get('/:id', (req, res) => { //id variable called to be passed along with req
+    res.send('Show Author ' + req.params.id) //paramas on req obj gives all params defined on url
+})
+
+router.get('/:id/edit', (req, res) => { //following REST principles on how to define urls
+    res.send('Edit Author ' + req.params.id)
+})
+
+router.put('/:id', (req, res) => { //REST uses put to update
+    res.send('Update Author ' + req.params.id)
+})
+
+router.delete('/:id', (req, res) => {
+    res.send(('Delete Author ' + req.params.id))
 })
 
 module.exports = router //exports router to be imported and user wherever the import is called; now can integrate routes with views

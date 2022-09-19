@@ -6,6 +6,7 @@ const express = require('express') //import express
 const app = express()
 const expressLayouts = require('express-ejs-layouts') //import express layouts package
 const bodyParser = require('body-parser') //easier to access the different access elements
+const methodOverride = require('method-override') //allows delete edit in routes
 
 const indexRouter = require('./routes/index') //import router into server using relative path
 const authorRouter = require('./routes/authors') //import ALL AUTHORS router into server using relative path
@@ -15,6 +16,7 @@ app.set('view engine', 'ejs') //set view engine to ejs
 app.set('views', __dirname + '/views') //where server rendered views with come from
 app.set('layout', 'layouts/layout') //every file put inside to prevent necessity of duplicating HTML and CSS files
 app.use(expressLayouts) //tells app to use express layouts
+app.use(methodOverride('_method')) //tells app to use method override
 app.use(express.static('public')) //tells app where all public files will come from
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: false })) //tells express how to use body-parser library; from body-parser
 
